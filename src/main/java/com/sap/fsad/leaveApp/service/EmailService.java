@@ -2,11 +2,15 @@ package com.sap.fsad.leaveApp.service;
 
 import com.sap.fsad.leaveApp.model.LeaveApplication;
 import com.sap.fsad.leaveApp.model.User;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import com.sap.fsad.leaveApp.model.enums.LeaveType;
-import com.sap.fsad.leaveApp.util.EmailTemplates;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.retry.annotation.Retryable;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Recover;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.TemplateEngine;
@@ -20,14 +24,13 @@ import java.util.Map;
 @Service
 public class EmailService {
 
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
+
     @Autowired
     private JavaMailSender mailSender;
 
     @Autowired
     private TemplateEngine templateEngine;
-
-    @Autowired
-    private EmailTemplates emailTemplates;
 
     /**
      * Send email with leave application details to manager
@@ -58,7 +61,7 @@ public class EmailService {
             sendEmail(manager.getEmail(), subject, content);
         } catch (Exception e) {
             // Log the error but don't propagate - non-critical operation
-            System.err.println("Failed to send leave application email: " + e.getMessage());
+            logger.error("Failed to send leave application email: {}", e.getMessage());
         }
     }
 
@@ -91,7 +94,7 @@ public class EmailService {
             sendEmail(employee.getEmail(), subject, content);
         } catch (Exception e) {
             // Log the error but don't propagate - non-critical operation
-            System.err.println("Failed to send leave approval email: " + e.getMessage());
+            logger.error("Failed to send leave approval email: {}", e.getMessage());
         }
     }
 
@@ -124,7 +127,7 @@ public class EmailService {
             sendEmail(employee.getEmail(), subject, content);
         } catch (Exception e) {
             // Log the error but don't propagate - non-critical operation
-            System.err.println("Failed to send leave rejection email: " + e.getMessage());
+            logger.error("Failed to send leave rejection email: {}", e.getMessage());
         }
     }
 
@@ -151,12 +154,12 @@ public class EmailService {
             templateVariables.put("applicationId", leaveApplication.getId());
 
             String subject = "Leave Application Withdrawn: " + employee.getFullName();
-            String content = emailTemplates.getLeaveWithdrawalTemplate(templateVariables);
+            String content = processTemplate("leave-withdrawal", templateVariables);
 
             sendEmail(manager.getEmail(), subject, content);
         } catch (Exception e) {
             // Log the error but don't propagate - non-critical operation
-            System.err.println("Failed to send leave withdrawal email: " + e.getMessage());
+            logger.error("Failed to send leave withdrawal email: {}", e.getMessage());
         }
     }
 
@@ -180,7 +183,7 @@ public class EmailService {
             sendEmail(user.getEmail(), subject, content);
         } catch (Exception e) {
             // Log the error but don't propagate - non-critical operation
-            System.err.println("Failed to send leave credit email: " + e.getMessage());
+            logger.error("Failed to send leave credit email to {}: {}", user.getEmail(), e.getMessage());
         }
     }
 
@@ -201,12 +204,12 @@ public class EmailService {
             templateVariables.put("reason", reason);
 
             String subject = "Special Leave Credit Notification";
-            String content = emailTemplates.getSpecialLeaveCreditTemplate(templateVariables);
+            String content = processTemplate("special-leave-credit", templateVariables);
 
             sendEmail(user.getEmail(), subject, content);
         } catch (Exception e) {
             // Log the error but don't propagate - non-critical operation
-            System.err.println("Failed to send special leave credit email: " + e.getMessage());
+            logger.error("Failed to send special leave credit email to {}: {}", user.getEmail(), e.getMessage());
         }
     }
 
@@ -221,7 +224,8 @@ public class EmailService {
 
             sendEmail(email, subject, content);
         } catch (Exception e) {
-            System.err.println("Failed to send reset password email: " + e.getMessage());
+            // Log the error but don't propagate - non-critical operation
+            logger.error("Failed to send reset password email to {}: {}", email, e.getMessage());
         }
     }
 
@@ -237,6 +241,7 @@ public class EmailService {
     /**
      * Send HTML email
      */
+    @Retryable(value = MessagingException.class, maxAttempts = 3, backoff = @Backoff(delay = 20000))
     public void sendEmail(String to, String subject, String htmlContent) throws MessagingException {
         MimeMessage message = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
@@ -245,4 +250,9 @@ public class EmailService {
         helper.setText(htmlContent, true);
         mailSender.send(message);
     }
+
+    @Recover
+    public void recover(MessagingException e, String to, String subject, String htmlContent) {
+    logger.error("Failed to send email to {} after multiple attempts: {}", to, e.getMessage());
+}
 }

@@ -7,11 +7,13 @@ import com.sap.fsad.leaveApp.dto.response.ApiResponse;
 import com.sap.fsad.leaveApp.dto.response.UserResponse;
 import com.sap.fsad.leaveApp.exception.BadRequestException;
 import com.sap.fsad.leaveApp.exception.ResourceNotFoundException;
+import com.sap.fsad.leaveApp.model.AuditLog;
 import com.sap.fsad.leaveApp.model.LeaveApplication;
 import com.sap.fsad.leaveApp.model.LeavePolicy;
 import com.sap.fsad.leaveApp.model.User;
 import com.sap.fsad.leaveApp.model.enums.LeaveStatus;
 import com.sap.fsad.leaveApp.model.enums.UserRole;
+import com.sap.fsad.leaveApp.repository.AuditLogRepository;
 import com.sap.fsad.leaveApp.repository.LeaveApplicationRepository;
 import com.sap.fsad.leaveApp.repository.LeavePolicyRepository;
 import com.sap.fsad.leaveApp.repository.UserRepository;
@@ -44,32 +46,35 @@ public class AdminService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @Autowired
+    private AuditLogRepository auditLogRepository;
+
     public DashboardStatsResponse getDashboardStats() {
         User currentUser = userService.getCurrentUser();
-        
+
         // Verify admin role
         if (!currentUser.getRoles().contains(UserRole.ADMIN)) {
             throw new BadRequestException("You don't have permission to access admin dashboard");
         }
-        
+
         DashboardStatsResponse stats = new DashboardStatsResponse();
-        
+
         // Total users count
         stats.setTotalUsers(userRepository.count());
-        
+
         // Active users count
         stats.setActiveUsers(userRepository.findByIsActiveTrue().size());
-        
+
         // Total pending leaves
         stats.setPendingLeaves(leaveApplicationRepository.countByUserIdAndStatus(null, LeaveStatus.PENDING));
-        
+
         // Role distribution
         Map<UserRole, Long> roleDistribution = new HashMap<>();
         for (UserRole role : UserRole.values()) {
             roleDistribution.put(role, (long) userRepository.findByRole(role).size());
         }
         stats.setRoleDistribution(roleDistribution);
-        
+
         // Recent leave applications
         List<LeaveApplication> recentLeaves = leaveApplicationRepository.findAll().stream()
                 .sorted((l1, l2) -> l2.getCreatedAt().compareTo(l1.getCreatedAt()))
@@ -78,6 +83,16 @@ public class AdminService {
         stats.setRecentLeaveApplications(recentLeaves);
 
         return stats;
+    }
+
+    private void logAdminAction(String action, String details) {
+        User currentUser = userService.getCurrentUser();
+        AuditLog log = new AuditLog();
+        log.setAction(action);
+        log.setDetails(details);
+        log.setAdminId(currentUser.getId());
+        log.setActionTimestamp(LocalDateTime.now());
+        auditLogRepository.save(log);
     }
 
     /**
@@ -130,7 +145,7 @@ public class AdminService {
         }
 
         if (request.getRoles() != null) {
-            
+
             if (!request.getRoles().contains(UserRole.ADMIN) && !currentUser.getRoles().contains(UserRole.ADMIN)) {
                 throw new BadRequestException("You don't have permission to assign this role");
             }
@@ -159,6 +174,9 @@ public class AdminService {
 
         user.setUpdatedAt(LocalDateTime.now());
         User updatedUser = userRepository.save(user);
+
+        logAdminAction("UPDATE_USER_DETAILS",
+                "USER ID: " + updatedUser.getId());
 
         return convertToUserResponse(updatedUser);
     }
@@ -199,7 +217,12 @@ public class AdminService {
         leavePolicy.setIsActive(request.getIsActive());
         leavePolicy.setUpdatedAt(LocalDateTime.now());
 
-        return leavePolicyRepository.save(leavePolicy);
+        LeavePolicy savedPolicy = leavePolicyRepository.save(leavePolicy);
+
+        logAdminAction(request.getId() == null ? "CREATE_LEAVE_POLICY" : "UPDATE_LEAVE_POLICY",
+                "Policy ID: " + savedPolicy.getId() + ", Type: " + savedPolicy.getLeaveType());
+
+        return savedPolicy;
     }
 
     /**
@@ -255,6 +278,9 @@ public class AdminService {
             return new ApiResponse(true, "Leave policy marked as inactive successfully");
         }
 
+        logAdminAction("DELETE_LEAVE_POLICY",
+                "Policy ID: " + leavePolicy.getId() + ", Type: " + leavePolicy.getLeaveType());
+
         leavePolicyRepository.delete(leavePolicy);
         return new ApiResponse(true, "Leave policy deleted successfully");
     }
@@ -274,8 +300,6 @@ public class AdminService {
         response.setEmergencyContact(user.getEmergencyContact());
         response.setPhone(user.getPhone());
         response.setLastLogin(user.getLastLogin());
-        
-
 
         if (user.getManager() != null) {
             response.setManagerId(user.getManager().getId());

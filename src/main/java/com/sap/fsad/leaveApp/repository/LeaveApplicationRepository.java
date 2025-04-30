@@ -10,10 +10,12 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
 public interface LeaveApplicationRepository extends JpaRepository<LeaveApplication, Long> {
+    List<LeaveApplication> findByStatus(LeaveStatus status);
     List<LeaveApplication> findByUserId(Long userId);
     List<LeaveApplication> findByUser(User user);
     List<LeaveApplication> findByUserIdAndStatus(Long userId, LeaveStatus status);
@@ -38,9 +40,15 @@ public interface LeaveApplicationRepository extends JpaRepository<LeaveApplicati
 
     @Query("SELECT CASE WHEN COUNT(l) > 0 THEN true ELSE false END FROM LeaveApplication l " +
             "WHERE l.user.id = :userId AND l.status IN :statuses " +
-            "AND l.startDate <= :endDate AND l.endDate >= :startDate")
+            "AND (l.startDate <= :endDate AND l.endDate >= :startDate)")
     boolean existsOverlappingLeave(@Param("userId") Long userId,
-            @Param("startDate") LocalDate startDate,
-            @Param("endDate") LocalDate endDate,
-            @Param("statuses") List<LeaveStatus> statuses);
+                    @Param("startDate") LocalDate startDate,
+                    @Param("endDate") LocalDate endDate,
+                    @Param("statuses") List<LeaveStatus> statuses);
+
+    @Query("SELECT la FROM LeaveApplication la WHERE la.status = 'PENDING' AND la.appliedOn <= :timeoutThreshold")
+    List<LeaveApplication> findPendingLeavesBefore(@Param("timeoutThreshold") LocalDateTime timeoutThreshold);
+
+    @Query("SELECT l FROM LeaveApplication l WHERE l.user.department = :department")
+    List<LeaveApplication> findByUserDepartment(@Param("department") String department);
 }

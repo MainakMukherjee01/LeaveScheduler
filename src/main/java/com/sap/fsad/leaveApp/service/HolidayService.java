@@ -3,7 +3,10 @@ package com.sap.fsad.leaveApp.service;
 import com.sap.fsad.leaveApp.dto.response.ApiResponse;
 import com.sap.fsad.leaveApp.exception.BadRequestException;
 import com.sap.fsad.leaveApp.exception.ResourceNotFoundException;
+import com.sap.fsad.leaveApp.model.AuditLog;
 import com.sap.fsad.leaveApp.model.Holiday;
+import com.sap.fsad.leaveApp.model.User;
+import com.sap.fsad.leaveApp.repository.AuditLogRepository;
 import com.sap.fsad.leaveApp.repository.HolidayRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -19,6 +22,22 @@ public class HolidayService {
     @Autowired
     private HolidayRepository holidayRepository;
 
+    @Autowired
+    private UserService userService;
+
+    @Autowired
+private AuditLogRepository auditLogRepository;
+
+private void logAdminAction(String action, String details) {
+    User currentUser = userService.getCurrentUser();
+    AuditLog log = new AuditLog();
+    log.setAction(action);
+    log.setDetails(details);
+    log.setAdminId(currentUser.getId());
+    log.setActionTimestamp(LocalDateTime.now());
+    auditLogRepository.save(log);
+}
+
     /**
      * Create a new holiday
      */
@@ -31,7 +50,10 @@ public class HolidayService {
 
         holiday.setCreatedAt(LocalDateTime.now());
         holiday.setUpdatedAt(LocalDateTime.now());
-        return holidayRepository.save(holiday);
+        Holiday savedHoliday = holidayRepository.save(holiday);
+
+        logAdminAction("CREATE_HOLIDAY", "Holiday created: " + savedHoliday.getName());
+        return savedHoliday;
     }
 
     /**
@@ -88,7 +110,10 @@ public class HolidayService {
         holiday.setDescription(holidayDetails.getDescription());
         holiday.setUpdatedAt(LocalDateTime.now());
 
-        return holidayRepository.save(holiday);
+        Holiday updatedHoliday = holidayRepository.save(holiday);
+
+        logAdminAction("UPDATE_HOLIDAY", "Holiday updated: " + updatedHoliday.getName());
+        return updatedHoliday;
     }
 
     /**
@@ -97,6 +122,7 @@ public class HolidayService {
     @Transactional
     public ApiResponse deleteHoliday(Long id) {
         Holiday holiday = getHolidayById(id);
+        logAdminAction("DELETE_HOLIDAY", "Holiday deleted: " + holiday.getName());
         holidayRepository.delete(holiday);
         return new ApiResponse(true, "Holiday deleted successfully");
     }
