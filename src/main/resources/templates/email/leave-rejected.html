@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8" />
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            color: #333;
+        }
+
+        .content {
+            margin: 20px;
+        }
+
+        .footer {
+            margin-top: 30px;
+            font-size: 0.9em;
+            color: #777;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="content">
+        <p>Hi <strong th:text="${employeeName}">Employee Name</strong>,</p>
+
+        <p>Your application (ID:
+            <strong th:text="${applicationId}">12345</strong>) for
+            <strong th:text="${numberOfDays}">X</strong> days of
+            <strong th:text="${leaveType}">LeaveType</strong> leave
+            from <strong th:text="${startDate}">YYYY-MM-DD</strong> to
+            <strong th:text="${endDate}">YYYY-MM-DD</strong> has been
+            <span style="color:red;"><strong>REJECTED</strong></span> by
+            <strong th:text="${managerName}">Manager Name</strong>.
+        </p>
+
+        <p><strong>Remarks:</strong> <span th:text="${remarks}">Rejection remarks</span></p>
+
+        <p>If you wish to discuss further, please contact your manager.</p>
+
+        <div class="footer">
+            <p>Kind regards,<br />
+                <em>Leave Scheduler System</em>
+            </p>
+        </div>
+    </div>
+</body>
+
+</html>

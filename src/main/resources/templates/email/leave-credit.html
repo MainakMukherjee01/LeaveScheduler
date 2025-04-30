@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8" />
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            color: #333;
+        }
+
+        .content {
+            margin: 20px;
+        }
+
+        .footer {
+            margin-top: 30px;
+            font-size: 0.9em;
+            color: #777;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="content">
+        <p>Hi <strong th:text="${userName}">User Name</strong>,</p>
+
+        <p>We have credited your annual leave balance for the year
+            <strong th:text="${year}">2025</strong>. Please log in to your dashboard
+            to view your updated leave balances.
+        </p>
+
+        <p>We wish you a productive year ahead!</p>
+
+        <div class="footer">
+            <p>Best regards,<br />
+                <em>Leave Scheduler System</em>
+            </p>
+        </div>
+    </div>
+</body>
+
+</html>
