@@ -74,11 +74,12 @@ public class LeaveService {
         }
 
         // Check for holiday conflicts
-    List<Holiday> conflictingHolidays = holidayService.getHolidaysBetweenDates(request.getStartDate(), request.getEndDate());
-    if (!conflictingHolidays.isEmpty()) {
-        throw new BadRequestException("Leave dates conflict with public holidays: " +
-                conflictingHolidays.stream().map(Holiday::getName).collect(Collectors.joining(", ")));
-    }
+        List<Holiday> conflictingHolidays = holidayService.getHolidaysBetweenDates(request.getStartDate(),
+                request.getEndDate());
+        if (!conflictingHolidays.isEmpty()) {
+            throw new BadRequestException("Leave dates conflict with public holidays: " +
+                    conflictingHolidays.stream().map(Holiday::getName).collect(Collectors.joining(", ")));
+        }
 
         // Calculate number of working days
         int workingDays = leaveCalculator.calculateWorkingDays(request.getStartDate(), request.getEndDate());
@@ -307,8 +308,7 @@ public class LeaveService {
                     leave.getEndDate(),
                     leave.getUser().getFullName(),
                     leave.getLeaveType().toString(),
-                    "Leave"
-            ));
+                    "Leave"));
         }
 
         // Fetch holidays
@@ -319,12 +319,12 @@ public class LeaveService {
                     holiday.getDate(),
                     null,
                     holiday.getName(),
-                    "Holiday"
-            ));
+                    "Holiday"));
         }
 
         return events;
     }
+
     /**
      * Get leave history with optional filters
      */

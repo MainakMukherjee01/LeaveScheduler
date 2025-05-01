@@ -26,17 +26,17 @@ public class HolidayService {
     private UserService userService;
 
     @Autowired
-private AuditLogRepository auditLogRepository;
+    private AuditLogRepository auditLogRepository;
 
-private void logAdminAction(String action, String details) {
-    User currentUser = userService.getCurrentUser();
-    AuditLog log = new AuditLog();
-    log.setAction(action);
-    log.setDetails(details);
-    log.setAdminId(currentUser.getId());
-    log.setActionTimestamp(LocalDateTime.now());
-    auditLogRepository.save(log);
-}
+    private void logAdminAction(String action, String details) {
+        User currentUser = userService.getCurrentUser();
+        AuditLog log = new AuditLog();
+        log.setAction(action);
+        log.setDetails(details);
+        log.setAdminId(currentUser.getId());
+        log.setActionTimestamp(LocalDateTime.now());
+        auditLogRepository.save(log);
+    }
 
     /**
      * Create a new holiday

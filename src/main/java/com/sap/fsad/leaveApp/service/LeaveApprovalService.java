@@ -106,7 +106,7 @@ public class LeaveApprovalService {
         leaveBalance.setUpdatedAt(LocalDateTime.now());
         leaveBalanceRepository.save(leaveBalance);
 
-         // Log the action
+        // Log the action
         AuditLog auditLog = new AuditLog();
         auditLog.setAdminId(currentUser.getId());
         auditLog.setLeaveApplication(leaveApplication);
@@ -212,7 +212,8 @@ public class LeaveApprovalService {
     private int autoApprovalTimeoutHours;
 
     /**
-     * Scheduled task to automatically approve pending leave applications after timeout
+     * Scheduled task to automatically approve pending leave applications after
+     * timeout
      */
     @Scheduled(cron = "0 0 * * * *") // Runs every hour
     @Transactional
@@ -230,7 +231,8 @@ public class LeaveApprovalService {
             // Update leave balance
             LeaveBalance leaveBalance = leaveBalanceRepository.findByUserAndLeaveTypeAndYear(
                     leave.getUser(), leave.getLeaveType(), leave.getStartDate().getYear())
-                    .orElseThrow(() -> new ResourceNotFoundException("LeaveBalance", "user and type", leave.getUser().getId()));
+                    .orElseThrow(() -> new ResourceNotFoundException("LeaveBalance", "user and type",
+                            leave.getUser().getId()));
 
             leaveBalance.setBalance(leaveBalance.getBalance() - leave.getNumberOfDays());
             leaveBalance.setUsed(leaveBalance.getUsed() + leave.getNumberOfDays());

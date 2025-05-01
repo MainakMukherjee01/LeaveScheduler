@@ -48,9 +48,8 @@ public class LeavePolicy {
 
     private Integer noticeRequired = 1; // Days
 
-    @ElementCollection(targetClass = UserRole.class, fetch = FetchType.EAGER)   
-    @CollectionTable(name = "leave_policy_applicable_roles",
-            joinColumns = @JoinColumn(name = "policy_id"))
+    @ElementCollection(targetClass = UserRole.class, fetch = FetchType.EAGER)
+    @CollectionTable(name = "leave_policy_applicable_roles", joinColumns = @JoinColumn(name = "policy_id"))
     @Enumerated(EnumType.STRING)
     private Set<UserRole> applicableRoles = new HashSet<>();
 

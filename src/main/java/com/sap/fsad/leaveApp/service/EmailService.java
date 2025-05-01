@@ -253,6 +253,6 @@ public class EmailService {
 
     @Recover
     public void recover(MessagingException e, String to, String subject, String htmlContent) {
-    logger.error("Failed to send email to {} after multiple attempts: {}", to, e.getMessage());
-}
+        logger.error("Failed to send email to {} after multiple attempts: {}", to, e.getMessage());
+    }
 }

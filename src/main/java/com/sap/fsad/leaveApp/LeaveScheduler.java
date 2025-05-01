@@ -14,7 +14,7 @@ public class LeaveScheduler {
     public static void main(String[] args) {
         Dotenv dotenv = Dotenv.load();
         System.setProperty("APP_JWT_SECRET", dotenv.get("APP_JWT_SECRET"));
-        System.setProperty("SPRING_DATASOURCE_USERNAMEE", dotenv.get("SPRING_DATASOURCE_USERNAME"));
+        System.setProperty("SPRING_DATASOURCE_USERNAME", dotenv.get("SPRING_DATASOURCE_USERNAME"));
         System.setProperty("SPRING_DATASOURCE_PASSWORD", dotenv.get("SPRING_DATASOURCE_PASSWORD"));
         System.setProperty("SPRING_MAIL_USERNAME", dotenv.get("SPRING_MAIL_USERNAME"));
         System.setProperty("SPRING_MAIL_PASSWORD", dotenv.get("SPRING_MAIL_PASSWORD"));

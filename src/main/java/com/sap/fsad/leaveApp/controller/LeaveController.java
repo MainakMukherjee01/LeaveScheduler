@@ -93,7 +93,6 @@ public class LeaveController {
         List<LeaveResponse> history = leaveService.getLeaveHistory(startDate, endDate, leaveType);
         return ResponseEntity.ok(history);
     }
-    
 
     @GetMapping("/stats")
     @Operation(summary = "Get current user's leave statistics")

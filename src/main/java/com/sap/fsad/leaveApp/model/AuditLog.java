@@ -19,12 +19,11 @@ public class AuditLog {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    
+
     private Long adminId;
 
     @ManyToOne
     @JoinColumn(name = "leave_application_id", nullable = true)
-    @ElementCollection(fetch = FetchType.LAZY)
     @JsonIgnore
     private LeaveApplication leaveApplication;
 
