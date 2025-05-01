@@ -1,0 +1,860 @@
+{
+	"info": {
+		"_postman_id": "c4a199d8-fef7-4d09-8ff1-60dc43035329",
+		"name": "LeaveSchedulerCollection",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
+		"_exporter_id": "40623600"
+	},
+	"item": [
+		{
+			"name": "Auth-Controller",
+			"item": [
+				{
+					"name": "RegisterMultipleUsers-NOAUTH",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "[\n  {\n    \"username\": \"user001\",\n    \"password\": \"Password@123\",\n    \"fullName\": \"User One\",\n    \"email\": \"user001@example.com\",\n    \"roles\": [\"ADMIN\"],\n    \"department\": \"Human Resources\",\n    \"managerId\": null,\n    \"joiningDate\": \"2023-05-01\",\n    \"phone\": \"1234567890\",\n    \"emergencyContact\": \"John Doe - 9876543210\"\n  },\n  {\n    \"username\": \"user002\",\n    \"password\": \"Password@456\",\n    \"fullName\": \"User Two\",\n    \"email\": \"user002@example.com\",\n    \"roles\": [\"MANAGER\"],\n    \"department\": \"IT\",\n    \"managerId\": null,\n    \"joiningDate\": \"2023-07-01\",\n    \"phone\": \"4567891230\",\n    \"emergencyContact\": \"Alice Doe - 7894561230\"\n  },\n  {\n    \"username\": \"user003\",\n    \"password\": \"Password@789\",\n    \"fullName\": \"User Three\",\n    \"email\": \"user003@example.com\",\n    \"roles\": [\"EMPLOYEE\"],\n    \"department\": \"Finance\",\n    \"managerId\": 1,\n    \"joiningDate\": \"2023-06-01\",\n    \"phone\": \"9876543210\",\n    \"emergencyContact\": \"Jane Doe - 1234567890\"\n  }\n]",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "http://localhost:8080/api/auth/register/batch"
+					},
+					"response": []
+				},
+				{
+					"name": "RegisterUser-NOAUTH",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"username\": \"user000\",\n  \"password\": \"Password@000\",\n  \"fullName\": \"User MASTER\",\n  \"email\": \"mmrox008@gmail.com\",\n  \"roles\": [\"ADMIN\", \"EMPLOYEE\", \"MANAGER\"],\n  \"department\": \"Human Resources\",\n  \"managerId\": null,\n  \"joiningDate\": \"2023-05-01\",\n  \"phone\": \"9876543210\",\n  \"emergencyContact\": \"John Doe - 1234567890\",\n  \"isActive\": true\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "http://localhost:8080/api/auth/register"
+					},
+					"response": []
+				},
+				{
+					"name": "LoginUser-NOAUTH",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"let response = pm.response.json();",
+									"",
+									"if (response.token) {",
+									"    pm.environment.set(\"jwtToken\", response.token);",
+									"    console.log(\"JWT token saved to environment variable: jwtToken\");",
+									"} else {",
+									"    console.error(\"JWT token not found in the response\");",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"username\": \"user000\",\n  \"password\": \"Password@000\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "http://localhost:8080/api/auth/login"
+					},
+					"response": []
+				},
+				{
+					"name": "LogoutUser-AUTH",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"let response = pm.response.json();",
+									"",
+									"if (response.token) {",
+									"    pm.environment.set(\"jwtToken\", response.token);",
+									"    console.log(\"JWT token saved to environment variable: jwtToken\");",
+									"} else {",
+									"    console.error(\"JWT token not found in the response\");",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"username\": \"user000\",\n  \"password\": \"Password@000\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "http://localhost:8080/api/auth/logout"
+					},
+					"response": []
+				},
+				{
+					"name": "ChangePassword-AUTH",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{jwtToken}}"
+							}
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"currentPassword\":\"Password@000\",\n    \"newPassword\":\"ChangedPassword@0000\",\n    \"confirmPassword\":\"ChangedPassword@0000\"\n}\n\n// To revert back to original password\n// {\n//     \"currentPassword\":\"ChangedPassword@0000\",\n//     \"newPassword\":\"Password@000\",\n//     \"confirmPassword\":\"Password@000\"\n// }",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "http://localhost:8080/api/auth/change-password"
+					},
+					"response": []
+				},
+				{
+					"name": "ForgotPassword-NOAUTH",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\":\"mmrox008@gmail.com\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "http://localhost:8080/api/auth/forgot-password"
+					},
+					"response": []
+				},
+				{
+					"name": "ForgotPassword-NOAUTH",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"token\":\"\",\n    \"newPassword\": \"Password@0000\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "http://localhost:8080/api/auth/reset-password"
+					},
+					"response": []
+				}
+			],
+			"auth": {
+				"type": "noauth"
+			},
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "Admin-Controller-ADMIN",
+			"item": [
+				{
+					"name": "AdminDashboard",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "http://localhost:8080/api/admin/dashboard-stats"
+					},
+					"response": []
+				},
+				{
+					"name": "GetAllUsers",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "http://localhost:8080/api/admin/users"
+					},
+					"response": []
+				},
+				{
+					"name": "UpdateSpecificUser",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"fullName\": \"John Doe\",\n  \"email\": \"john.doe@example.com\",\n  \"department\": \"Engineering\",\n  \"roles\": [\"ADMIN\", \"MANAGER\"],\n  \"managerId\": 3,\n  \"password\": \"Password@789\",\n  \"isActive\": true\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "http://localhost:8080/api/admin/users/3"
+					},
+					"response": []
+				},
+				{
+					"name": "Create/UpdateLeavePolicies",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "// {\n//   \"leaveType\": \"EARNED\",\n//   \"description\": \"EARNED leave policy\",\n//   \"annualCredit\": 12.0,\n//   \"maxAccumulation\": 30.0,\n//   \"isCarryForward\": true,\n//   \"minDuration\": 1,\n//   \"maxDuration\": 10,\n//   \"noticeRequired\": 2,\n//   \"applicableRoles\": [\"EMPLOYEE\", \"MANAGER\"],\n//   \"isActive\": true\n// }\n\n{\n  \"leaveType\": \"CASUAL\",\n  \"description\": \"CASUAL leave policy\",\n  \"annualCredit\": 12.0,\n  \"maxAccumulation\": 30.0,\n  \"isCarryForward\": true,\n  \"minDuration\": 1,\n  \"maxDuration\": 10,\n  \"noticeRequired\": 2,\n  \"applicableRoles\": [\"ADMIN\", \"EMPLOYEE\", \"MANAGER\"],\n  \"isActive\": true\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "http://localhost:8080/api/admin/leave-policies"
+					},
+					"response": []
+				},
+				{
+					"name": "GetAllLeavePolicies",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "http://localhost:8080/api/admin/leave-policies"
+					},
+					"response": []
+				},
+				{
+					"name": "GetSpecificLeavePolicy",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "http://localhost:8080/api/admin/leave-policies/1"
+					},
+					"response": []
+				},
+				{
+					"name": "DeleteSpecificLeavePolicy",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": "http://localhost:8080/api/admin/leave-policies/2"
+					},
+					"response": []
+				},
+				{
+					"name": "CreditLeavesToAllUsers",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": "http://localhost:8080/api/admin/credit-leaves"
+					},
+					"response": []
+				},
+				{
+					"name": "CreditSpecialLeaveToSpecificUser",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "http://localhost:8080/api/admin/credit-special-leave"
+					},
+					"response": []
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "Holiday-Controller-AUTH",
+			"item": [
+				{
+					"name": "CreateHoliday",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"HOLIDAY DATA TYPE\":\"\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "http://localhost:8080/api/holidays"
+					},
+					"response": []
+				},
+				{
+					"name": "GetAllHolidays",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "http://localhost:8080/api/holidays/"
+					},
+					"response": []
+				},
+				{
+					"name": "GetAllHolidayById",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "http://localhost:8080/api/holidays/1"
+					},
+					"response": []
+				},
+				{
+					"name": "GetAllHolidayByYear",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "http://localhost:8080/api/holidays/year/2024"
+					},
+					"response": []
+				},
+				{
+					"name": "GetHolidayByMonthAndYear",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "http://localhost:8080/api/holidays/month/11/year/2024"
+					},
+					"response": []
+				},
+				{
+					"name": "UpdateHolidayById-ADMIN",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"url": "http://localhost:8080/api/holidays/1"
+					},
+					"response": []
+				},
+				{
+					"name": "DeleteHolidayById-ADMIN",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": "http://localhost:8080/api/holidays/1"
+					},
+					"response": []
+				},
+				{
+					"name": "GetCalenderView",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "http://localhost:8080/api/holidays/calender"
+					},
+					"response": []
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "Leave-Approval-MANAGER",
+			"item": [
+				{
+					"name": "GetPendingLeave-MANAGER",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "http://localhost:8080/api/leave-approvals/pending"
+					},
+					"response": []
+				},
+				{
+					"name": "ApproveLeave-MANAGER",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"url": "http://localhost:8080/api/leave-approvals/1/approve"
+					},
+					"response": []
+				},
+				{
+					"name": "GetApprovedLeaves-MANAGER",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "http://localhost:8080/api/leave-approvals/approved"
+					},
+					"response": []
+				},
+				{
+					"name": "RejectLeave-MANAGER",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"url": "http://localhost:8080/api/leave-approvals/1/reject"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Leave-Controller-AUTH",
+			"item": [
+				{
+					"name": "ApplyNewLeave",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"startDate\": \"2025-05-01\",\r\n  \"endDate\": \"2025-05-05\",\r\n  \"leaveType\": \"CASUAL\",\r\n  \"reason\": \"Family vacation\",\r\n  \"contactAddress\": \"123 Main Street\",\r\n  \"contactPhone\": \"9876543210\",\r\n  \"attachmentPath\": null\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "http://localhost:8080/api/leave-applications"
+					},
+					"response": []
+				},
+				{
+					"name": "GetUserLeaveApplications",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "http://localhost:8080/api/leave-applications"
+					},
+					"response": []
+				},
+				{
+					"name": "CheckUserEligibility",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "http://localhost:8080/api/leave-applications/eligibility"
+					},
+					"response": []
+				},
+				{
+					"name": "FilterHistoryByDate",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"startDate\":\"2025-01-01\",\n    \"endDate\":\"2025-01-31\",\n    \"leaveType\":\"EARNED\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "http://localhost:8080/api/leave-applications/filter-history"
+					},
+					"response": []
+				},
+				{
+					"name": "GetPendingLeaveApplications",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "http://localhost:8080/api/leave-applications/pending"
+					},
+					"response": []
+				},
+				{
+					"name": "GetLeaveApplicationsById",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "http://localhost:8080/api/leave-applications/1"
+					},
+					"response": []
+				},
+				{
+					"name": "GetUserLeaveAndHolidayCalender",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "http://localhost:8080/api/leave-applications/calender"
+					},
+					"response": []
+				},
+				{
+					"name": "WithdrawApplications",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"url": "http://localhost:8080/api/leave-applications/1/withdraw"
+					},
+					"response": []
+				},
+				{
+					"name": "GetUser'sLeaveStatistics",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "http://localhost:8080/api/leave-applications/stats"
+					},
+					"response": []
+				},
+				{
+					"name": "GetPastLeaveApplications",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "http://localhost:8080/api/leave-applications/history"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Notification-Controller-AUTH",
+			"item": [
+				{
+					"name": "GetUserNotifications",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "http://localhost:8080/api/notifications"
+					},
+					"response": []
+				},
+				{
+					"name": "GetUserUnreadNotifications",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "http://localhost:8080/api/notifications/unread"
+					},
+					"response": []
+				},
+				{
+					"name": "GetUserUnreadNotificationsCount",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "http://localhost:8080/api/notifications/unread-count"
+					},
+					"response": []
+				},
+				{
+					"name": "MarkNotificationAsRead",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"url": "http://localhost:8080/api/notifications/1/read"
+					},
+					"response": []
+				},
+				{
+					"name": "MarkAllNotificationsAsRead",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"url": "http://localhost:8080/api/notifications/unread"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "User-Controller-AUTH",
+			"item": [
+				{
+					"name": "GetUserProfile",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "http://localhost:8080/api/users/profile"
+					},
+					"response": []
+				},
+				{
+					"name": "GetUserLeaveBalance",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "http://localhost:8080/api/users/leave-balance"
+					},
+					"response": []
+				},
+				{
+					"name": "GetSpecificUserLeaveBalance-ADMIN/MANAGER",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "http://localhost:8080/api/users/1/leave-balance"
+					},
+					"response": []
+				},
+				{
+					"name": "GetAllUsers-ADMIN",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "http://localhost:8080/api/users/all"
+					},
+					"response": []
+				},
+				{
+					"name": "GetUsersUnderSpecificManager-MANAGER",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "http://localhost:8080/api/users/managed"
+					},
+					"response": []
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "AuditLogController-ADMIN",
+			"item": [
+				{
+					"name": "GetAllAdminAuditLogs",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "http://localhost:8080/api/audit-logs"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Reports-AUTH",
+			"item": [
+				{
+					"name": "LeaveUsageReport",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "http://localhost:8080/api/reports/leave-usage"
+					},
+					"response": []
+				},
+				{
+					"name": "PendingApprovalReport",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "http://localhost:8080/api/reports/pending-approvals"
+					},
+					"response": []
+				},
+				{
+					"name": "HolidayScheduleReport",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "http://localhost:8080/api/reports/holiday-schedule"
+					},
+					"response": []
+				},
+				{
+					"name": "LeaveUsageReportExportToExcel",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "http://localhost:8080/api/reports/leave-usage"
+					},
+					"response": []
+				},
+				{
+					"name": "LeaveUsageReportExportToPdf",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "http://localhost:8080/api/reports/leave-usage/export/pdf"
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": {
+			"token": "{{jwtToken}}"
+		}
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	]
+}

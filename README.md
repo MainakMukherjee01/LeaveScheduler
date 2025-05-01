@@ -13,3 +13,10 @@ For Samaresh:
 For Soumik: 
 
     git clone -b dev/Somku https://github.com/MainakMukherjee01/LeaveScheduler.git
+
+
+
+Until Tests are fixed:
+
+    Clean Install:  mvn clean install -DskipTests  
+              Run:  mvn spring-boot:run -DskipTests
