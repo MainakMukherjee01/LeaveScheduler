@@ -9,8 +9,10 @@ import com.sap.fsad.leaveApp.exception.BadRequestException;
 import com.sap.fsad.leaveApp.exception.ResourceNotFoundException;
 import com.sap.fsad.leaveApp.model.User;
 import com.sap.fsad.leaveApp.model.enums.UserRole;
+import com.sap.fsad.leaveApp.model.BlacklistedToken;
 import com.sap.fsad.leaveApp.model.LeaveBalance;
 import com.sap.fsad.leaveApp.model.LeavePolicy;
+import com.sap.fsad.leaveApp.repository.BlacklistTokenRepository;
 import com.sap.fsad.leaveApp.repository.LeaveBalanceRepository;
 import com.sap.fsad.leaveApp.repository.LeavePolicyRepository;
 import com.sap.fsad.leaveApp.repository.UserRepository;
@@ -36,7 +38,7 @@ import java.util.UUID;
 public class AuthService {
 
     private static final int MAX_FAILED_ATTEMPTS = 5;
-    private static final long LOCK_TIME_DURATION = 5 * 60 * 1000;
+    static final long LOCK_TIME_DURATION = 5 * 60 * 1000;
 
     @Autowired
     private AuthenticationManager authenticationManager;
@@ -58,6 +60,21 @@ public class AuthService {
 
     @Autowired
     private EmailService emailService;
+
+    @Autowired
+    private BlacklistTokenRepository blacklistTokenRepository; // Optional: For token blacklisting
+
+    public ApiResponse logout(String token) {
+        // Extract the token without the "Bearer " prefix
+        String jwt = token.replace("Bearer ", "");
+
+        BlacklistedToken blacklistedToken = new BlacklistedToken();
+        blacklistedToken.setToken(jwt);
+        blacklistedToken.setExpiryDate(tokenProvider.getExpiryDateFromToken(jwt));
+        blacklistTokenRepository.save(blacklistedToken);
+
+        return new ApiResponse(true, "User logged out successfully");
+    }
 
     /**
      * User login
