@@ -89,8 +89,7 @@ public class GlobalExceptionHandler {
 
         CustomErrorResponse errorResponse = new CustomErrorResponse(
                 LocalDateTime.now(),
-                "Validation failed: "
-                        + errors,
+                "Validation failed: {}" + errors,
                 request.getDescription(false));
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
