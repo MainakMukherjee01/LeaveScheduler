@@ -67,6 +67,8 @@ public class User {
 
         private LocalDate joiningDate;
 
+        private int failedLoginAttempts = 0;
+
         @Size(max = 20)
         private String phone;
 
@@ -74,6 +76,10 @@ public class User {
         private String emergencyContact;
 
         private boolean isActive = true;
+
+        private boolean isAccountLocked = false;
+
+        private Long lockTime = 0L;
 
         private LocalDateTime lastLogin;
 

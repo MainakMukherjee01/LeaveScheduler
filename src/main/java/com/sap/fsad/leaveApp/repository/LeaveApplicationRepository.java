@@ -30,23 +30,31 @@ public interface LeaveApplicationRepository extends JpaRepository<LeaveApplicati
         List<LeaveApplication> findByUserManagerIdAndStatus(Long managerId, LeaveStatus status);
 
         @Query("SELECT la FROM LeaveApplication la WHERE la.user.manager.id = :managerId AND la.status = :status")
-        List<LeaveApplication> findByManagerIdAndStatus(Long managerId, LeaveStatus status);
+        List<LeaveApplication> findByManagerIdAndStatus(@Param("manager_id") Long managerId,
+                        @Param("status") LeaveStatus status);
 
         @Query("SELECT la FROM LeaveApplication la WHERE la.startDate <= :endDate AND la.endDate >= :startDate AND la.user.id = :userId")
-        List<LeaveApplication> findOverlappingLeaves(LocalDate startDate, LocalDate endDate, Long userId);
+        List<LeaveApplication> findOverlappingLeaves(@Param("startDate") LocalDate startDate,
+                        @Param("endDate") LocalDate endDate,
+                        @Param("userId") Long userId);
 
         @Query("SELECT la FROM LeaveApplication la WHERE la.startDate BETWEEN :startDate AND :endDate OR la.endDate BETWEEN :startDate AND :endDate")
-        List<LeaveApplication> findLeavesInDateRange(LocalDate startDate, LocalDate endDate);
+        List<LeaveApplication> findLeavesInDateRange(@Param("startDate") LocalDate startDate,
+                        @Param("endDate") LocalDate endDate);
 
         @Query("SELECT SUM(la.numberOfDays) FROM LeaveApplication la WHERE la.user.id = :userId AND la.leaveType = :leaveType AND la.status = 'APPROVED' AND YEAR(la.startDate) = :year")
-        Float countApprovedLeavesByUserAndTypeAndYear(Long userId, LeaveType leaveType, int year);
+        Float countApprovedLeavesByUserAndTypeAndYear(@Param("userId") Long userId,
+                        @Param("leaveType") LeaveType leaveType,
+                        @Param("year") int year);
 
         @Query("SELECT COUNT(l) FROM LeaveApplication l WHERE l.user.id = :userId AND l.status = :status")
         int countByUserIdAndStatus(@Param("userId") Long userId, @Param("status") LeaveStatus status);
 
-        @Query("SELECT CASE WHEN COUNT(l) > 0 THEN true ELSE false END FROM LeaveApplication l " +
-                        "WHERE l.user.id = :userId AND l.status IN :statuses " +
-                        "AND (l.startDate <= :endDate AND l.endDate >= :startDate)")
+        @Query("SELECT CASE WHEN COUNT(la) > 0 THEN true ELSE false END " +
+                        "FROM LeaveApplication la " +
+                        "WHERE la.user.id = :userId " +
+                        "AND la.status IN :statuses " +
+                        "AND (la.startDate <= :endDate AND la.endDate >= :startDate)")
         boolean existsOverlappingLeave(@Param("userId") Long userId,
                         @Param("startDate") LocalDate startDate,
                         @Param("endDate") LocalDate endDate,

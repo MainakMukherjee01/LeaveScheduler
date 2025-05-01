@@ -35,6 +35,9 @@ import java.util.UUID;
 @Service
 public class AuthService {
 
+    private static final int MAX_FAILED_ATTEMPTS = 5;
+    private static final long LOCK_TIME_DURATION = 5 * 60 * 1000;
+
     @Autowired
     private AuthenticationManager authenticationManager;
 
@@ -60,28 +63,42 @@ public class AuthService {
      * User login
      */
     public JwtResponse login(LoginRequest loginRequest) {
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        loginRequest.getUsername(),
-                        loginRequest.getPassword()));
 
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-        String jwt = tokenProvider.generateToken(authentication);
+        User userName = userRepository.findByUsername(loginRequest.getUsername())
+                .orElseThrow(() -> new BadRequestException("Invalid username or password"));
 
-        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        if (isAccountLocked(userName)) {
+            throw new BadRequestException("Account is locked. Try again later.");
+        }
 
-        // Update last login time
-        User user = userRepository.findById(userDetails.getId())
-                .orElseThrow(() -> new ResourceNotFoundException("User", "id", userDetails.getId()));
-        user.setLastLogin(LocalDateTime.now());
-        userRepository.save(user);
+        try {
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            loginRequest.getUsername(),
+                            loginRequest.getPassword()));
+            resetFailedAttempts(userName);
 
-        return new JwtResponse(
-                jwt,
-                userDetails.getId(),
-                userDetails.getUsername(),
-                userDetails.getEmail(),
-                user.getRoles());
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+            String jwt = tokenProvider.generateToken(authentication);
+
+            CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+
+            // Update last login time
+            User user = userRepository.findById(userDetails.getId())
+                    .orElseThrow(() -> new ResourceNotFoundException("User", "id", userDetails.getId()));
+            user.setLastLogin(LocalDateTime.now());
+            userRepository.save(user);
+
+            return new JwtResponse(
+                    jwt,
+                    userDetails.getId(),
+                    userDetails.getUsername(),
+                    userDetails.getEmail(),
+                    user.getRoles());
+        } catch (Exception e) {
+            increaseFailedAttempts(userName);
+            throw new BadRequestException("Invalid username or password");
+        }
     }
 
     /**
@@ -262,5 +279,34 @@ public class AuthService {
 
     private boolean isValidPassword(String password) {
         return password.matches("^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=]).{8,}$");
+    }
+
+    public void increaseFailedAttempts(User user) {
+        int newFailAttempts = user.getFailedLoginAttempts() + 1;
+        user.setFailedLoginAttempts(newFailAttempts);
+        if (newFailAttempts >= MAX_FAILED_ATTEMPTS) {
+            user.setAccountLocked(true);
+            user.setLockTime(System.currentTimeMillis());
+        }
+        userRepository.save(user);
+    }
+
+    public void resetFailedAttempts(User user) {
+        user.setFailedLoginAttempts(0);
+        user.setAccountLocked(false);
+        user.setLockTime(null);
+        userRepository.save(user);
+    }
+
+    public boolean isAccountLocked(User user) {
+        if (!user.isAccountLocked())
+            return false;
+
+        long lockTimeElapsed = System.currentTimeMillis() - user.getLockTime();
+        if (lockTimeElapsed > LOCK_TIME_DURATION) {
+            resetFailedAttempts(user);
+            return false;
+        }
+        return true;
     }
 }

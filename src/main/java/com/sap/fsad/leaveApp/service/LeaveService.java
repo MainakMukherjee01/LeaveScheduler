@@ -126,7 +126,9 @@ public class LeaveService {
 
         // Check for overlapping leave applications
         if (leaveApplicationRepository.existsOverlappingLeave(
-                currentUser.getId(), request.getStartDate(), request.getEndDate(),
+                currentUser.getId(),
+                request.getStartDate(),
+                request.getEndDate(),
                 List.of(LeaveStatus.PENDING, LeaveStatus.APPROVED))) {
             throw new BadRequestException("You already have pending or approved leave during this period");
         }

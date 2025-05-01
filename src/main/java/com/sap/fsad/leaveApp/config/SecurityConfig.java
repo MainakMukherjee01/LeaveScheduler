@@ -1,6 +1,7 @@
 package com.sap.fsad.leaveApp.config;
 
 import com.sap.fsad.leaveApp.security.JwtAuthenticationFilter;
+import com.sap.fsad.leaveApp.security.RateLimitingFilter;
 import com.sap.fsad.leaveApp.security.UserDetailsServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -42,6 +43,11 @@ public class SecurityConfig {
     }
 
     @Bean
+    RateLimitingFilter rateLimitingFilter() {
+        return new RateLimitingFilter();
+    }
+
+    @Bean
     DaoAuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
 
@@ -74,7 +80,9 @@ public class SecurityConfig {
                 .headers(headers -> headers.frameOptions(frameOptions -> frameOptions.disable()));
 
         // Add JWT filter, but exclude /h2-console/**
-        http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
+        http
+            .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
+            .addFilterBefore(rateLimitingFilter(), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
