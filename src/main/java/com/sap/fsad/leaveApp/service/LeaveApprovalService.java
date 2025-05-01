@@ -5,13 +5,17 @@ import com.sap.fsad.leaveApp.dto.response.ApiResponse;
 import com.sap.fsad.leaveApp.dto.response.LeaveResponse;
 import com.sap.fsad.leaveApp.exception.BadRequestException;
 import com.sap.fsad.leaveApp.exception.ResourceNotFoundException;
+import com.sap.fsad.leaveApp.model.AuditLog;
 import com.sap.fsad.leaveApp.model.LeaveApplication;
 import com.sap.fsad.leaveApp.model.LeaveBalance;
 import com.sap.fsad.leaveApp.model.User;
 import com.sap.fsad.leaveApp.model.enums.LeaveStatus;
+import com.sap.fsad.leaveApp.repository.AuditLogRepository;
 import com.sap.fsad.leaveApp.repository.LeaveApplicationRepository;
 import com.sap.fsad.leaveApp.repository.LeaveBalanceRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,6 +40,9 @@ public class LeaveApprovalService {
 
     @Autowired
     private EmailService emailService;
+
+    @Autowired
+    private AuditLogRepository auditLogRepository;
 
     /**
      * Get all pending leave applications for approval
@@ -99,6 +106,15 @@ public class LeaveApprovalService {
         leaveBalance.setUpdatedAt(LocalDateTime.now());
         leaveBalanceRepository.save(leaveBalance);
 
+        // Log the action
+        AuditLog auditLog = new AuditLog();
+        auditLog.setAdminId(currentUser.getId());
+        auditLog.setLeaveApplication(leaveApplication);
+        auditLog.setAction(LeaveStatus.APPROVED.toString());
+        auditLog.setDetails(request.getRemarks());
+        auditLog.setActionTimestamp(LocalDateTime.now());
+        auditLogRepository.save(auditLog);
+
         // Notify employee
         notificationService.createLeaveApprovedNotification(leaveApplication.getUser(), leaveApplication);
         emailService.sendLeaveApprovedEmail(leaveApplication);
@@ -133,6 +149,15 @@ public class LeaveApprovalService {
         leaveApplication.setRemarks(request.getRemarks());
         leaveApplication.setUpdatedAt(LocalDateTime.now());
         leaveApplicationRepository.save(leaveApplication);
+
+        // Log the action
+        AuditLog auditLog = new AuditLog();
+        auditLog.setAdminId(currentUser.getId());
+        auditLog.setLeaveApplication(leaveApplication);
+        auditLog.setAction(LeaveStatus.REJECTED.toString());
+        auditLog.setDetails(request.getRemarks());
+        auditLog.setActionTimestamp(LocalDateTime.now());
+        auditLogRepository.save(auditLog);
 
         // Notify employee
         notificationService.createLeaveRejectedNotification(leaveApplication.getUser(), leaveApplication);
@@ -181,5 +206,41 @@ public class LeaveApprovalService {
         response.setRemarks(leaveApplication.getRemarks());
 
         return response;
+    }
+
+    @Value("${leave.auto-approval.timeout-hours:48}") // Default timeout is 48 hours
+    private int autoApprovalTimeoutHours;
+
+    /**
+     * Scheduled task to automatically approve pending leave applications after
+     * timeout
+     */
+    @Scheduled(cron = "0 0 * * * *") // Runs every hour
+    @Transactional
+    public void autoApprovePendingLeaves() {
+        LocalDateTime timeoutThreshold = LocalDateTime.now().minusHours(autoApprovalTimeoutHours);
+
+        List<LeaveApplication> pendingLeaves = leaveApplicationRepository.findPendingLeavesBefore(timeoutThreshold);
+
+        for (LeaveApplication leave : pendingLeaves) {
+            leave.setStatus(LeaveStatus.APPROVED);
+            leave.setApprovedBy(null); // No manager approved it
+            leave.setApprovedOn(LocalDateTime.now());
+            leaveApplicationRepository.save(leave);
+
+            // Update leave balance
+            LeaveBalance leaveBalance = leaveBalanceRepository.findByUserAndLeaveTypeAndYear(
+                    leave.getUser(), leave.getLeaveType(), leave.getStartDate().getYear())
+                    .orElseThrow(() -> new ResourceNotFoundException("LeaveBalance", "user and type",
+                            leave.getUser().getId()));
+
+            leaveBalance.setBalance(leaveBalance.getBalance() - leave.getNumberOfDays());
+            leaveBalance.setUsed(leaveBalance.getUsed() + leave.getNumberOfDays());
+            leaveBalanceRepository.save(leaveBalance);
+
+            // Notify user
+            notificationService.createLeaveApprovedNotification(leave.getUser(), leave);
+            emailService.sendLeaveApprovedEmail(leave);
+        }
     }
 }

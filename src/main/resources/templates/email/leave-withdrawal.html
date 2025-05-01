@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8" />
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            color: #333;
+        }
+
+        .content {
+            margin: 20px;
+        }
+
+        .footer {
+            margin-top: 30px;
+            font-size: 0.9em;
+            color: #777;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="content">
+        <p>Hi <strong th:text="${managerName}">Manager Name</strong>,</p>
+
+        <p>
+            <strong th:text="${employeeName}">Employee Name</strong> has withdrawn their leave application for
+            <strong th:text="${numberOfDays}">X</strong> days of
+            <strong th:text="${leaveType}">LeaveType</strong> leave
+            from <strong th:text="${startDate}">YYYY-MM-DD</strong> to
+            <strong th:text="${endDate}">YYYY-MM-DD</strong>.
+        </p>
+
+        <p>Application ID: <strong th:text="${applicationId}">12345</strong></p>
+
+        <div class="footer">
+            <p>Thank you,<br />
+                <em>Leave Scheduler System</em>
+            </p>
+        </div>
+    </div>
+</body>
+
+</html>

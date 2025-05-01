@@ -2,16 +2,21 @@ package com.sap.fsad.leaveApp.controller;
 
 import com.sap.fsad.leaveApp.dto.request.LeaveApplicationRequest;
 import com.sap.fsad.leaveApp.dto.response.ApiResponse;
+import com.sap.fsad.leaveApp.dto.response.LeaveBalanceResponse;
+import com.sap.fsad.leaveApp.dto.response.CalendarEventResponse;
 import com.sap.fsad.leaveApp.dto.response.LeaveResponse;
+import com.sap.fsad.leaveApp.model.enums.LeaveType;
 import com.sap.fsad.leaveApp.service.LeaveService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -36,6 +41,14 @@ public class LeaveController {
     public ResponseEntity<List<LeaveResponse>> getCurrentUserLeaves() {
         List<LeaveResponse> leaves = leaveService.getCurrentUserLeaves();
         return ResponseEntity.ok(leaves);
+    }
+
+    @GetMapping("/eligibility")
+    @Operation(summary = "Get leave eligibility details for the current user")
+    @SecurityRequirement(name = "bearerAuth")
+    public ResponseEntity<List<LeaveBalanceResponse>> getLeaveEligibilityDetails() {
+        List<LeaveBalanceResponse> eligibilityDetails = leaveService.getLeaveEligibilityDetails();
+        return ResponseEntity.ok(eligibilityDetails);
     }
 
     @GetMapping("/pending")
@@ -70,11 +83,32 @@ public class LeaveController {
         return ResponseEntity.ok(history);
     }
 
+    @GetMapping("/filter-history")
+    @Operation(summary = "Get leave history with optional filters")
+    @SecurityRequirement(name = "bearerAuth")
+    public ResponseEntity<List<LeaveResponse>> getLeaveHistory(
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
+            @RequestParam(required = false) LeaveType leaveType) {
+        List<LeaveResponse> history = leaveService.getLeaveHistory(startDate, endDate, leaveType);
+        return ResponseEntity.ok(history);
+    }
+
     @GetMapping("/stats")
     @Operation(summary = "Get current user's leave statistics")
     @SecurityRequirement(name = "bearerAuth")
     public ResponseEntity<LeaveResponse.LeaveStats> getLeaveStats() {
         LeaveResponse.LeaveStats stats = leaveService.getCurrentUserLeaveStats();
         return ResponseEntity.ok(stats);
+    }
+
+    @GetMapping("/calendar")
+    @Operation(summary = "Get leave schedules and holidays for calendar integration")
+    @SecurityRequirement(name = "bearerAuth")
+    public ResponseEntity<List<CalendarEventResponse>> getCalendarEvents(
+            @RequestParam(required = false) Long userId,
+            @RequestParam(required = false) String department) {
+        List<CalendarEventResponse> events = leaveService.getCalendarEvents(userId, department);
+        return ResponseEntity.ok(events);
     }
 }

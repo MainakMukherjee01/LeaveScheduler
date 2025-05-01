@@ -3,6 +3,7 @@ package com.sap.fsad.leaveApp.model;
 import com.sap.fsad.leaveApp.model.enums.LeaveStatus;
 import com.sap.fsad.leaveApp.model.enums.LeaveType;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -12,7 +13,6 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -73,6 +73,10 @@ public class LeaveApplication {
 
     @CreatedDate
     private LocalDateTime createdAt;
+
+    @Size(max = 100)
+    @Email
+    private String superiorEmail;
 
     @LastModifiedDate
     private LocalDateTime updatedAt;

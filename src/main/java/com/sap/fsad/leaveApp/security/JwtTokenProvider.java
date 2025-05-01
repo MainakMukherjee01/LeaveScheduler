@@ -2,12 +2,16 @@ package com.sap.fsad.leaveApp.security;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
+
+import com.sap.fsad.leaveApp.repository.BlacklistTokenRepository;
 
 import java.security.Key;
 import java.util.Arrays;
@@ -23,6 +27,9 @@ public class JwtTokenProvider {
 
     @Value("${app.jwt.expiration}")
     private int jwtExpirationInMs;
+
+    @Autowired
+    private BlacklistTokenRepository blacklistTokenRepository;
 
     private Key getSigningKey() {
         return Keys.hmacShaKeyFor(jwtSecret.getBytes());
@@ -81,8 +88,21 @@ public class JwtTokenProvider {
         return Long.parseLong(claims.get("userId").toString());
     }
 
+    public Date getExpiryDateFromToken(String token) {
+        Claims claims = Jwts.parserBuilder()
+                .setSigningKey(getSigningKey())
+                .build() // Replace 'secretKey' with your actual key variable
+                .parseClaimsJws(token)
+                .getBody();
+        return claims.getExpiration();
+    }
+
     public boolean validateToken(String authToken) {
         try {
+
+            if (blacklistTokenRepository.existsByToken(authToken)) {
+                return false;
+            }
             Jwts.parserBuilder()
                     .setSigningKey(getSigningKey())
                     .build()

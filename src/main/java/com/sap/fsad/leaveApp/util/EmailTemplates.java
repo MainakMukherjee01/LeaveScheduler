@@ -86,29 +86,4 @@ public class EmailTemplates {
     public static String getLeaveBalanceCreditSubject(LeaveBalance leaveBalance) {
         return leaveBalance.getLeaveType().toString() + " Leave Credited for " + leaveBalance.getYear();
     }
-
-    /**
-     * Get email template for leave application withdrawal
-     */
-
-    public String getLeaveWithdrawalTemplate(Map<String, Object> templateVariables) {
-        return "Dear " + templateVariables.get("managerName") + ",\n\n" +
-                "This is to inform you that " + templateVariables.get("employeeName") +
-                " has withdrawn their leave application for the period " +
-                templateVariables.get("startDate") + " to " + templateVariables.get("endDate") + ".\n\n" +
-                "Thank you.";
-    }
-
-    /**
-     * Get email template for special leave credit
-     */
-
-    public String getSpecialLeaveCreditTemplate(Map<String, Object> templateVariables) {
-        // Example implementation: Replace placeholders in a predefined template
-        String template = "Dear {userName},\n\nYou have been credited with {amount} days of {leaveType} leave for the following reason: {reason}.\n\nBest regards,\nHR Team";
-        for (Map.Entry<String, Object> entry : templateVariables.entrySet()) {
-            template = template.replace("{" + entry.getKey() + "}", entry.getValue().toString());
-        }
-        return template;
-    }
 }

@@ -131,6 +131,13 @@ public class LeaveCreditService {
             } else {
                 // Just add the annual credit
                 balance.setBalance(balance.getBalance() + policy.getAnnualCredit());
+
+                // Apply maximum accrual limit
+                if (policy.getMaxAccumulation() != null &&
+                        balance.getBalance() > policy.getMaxAccumulation()) {
+                    balance.setBalance(policy.getMaxAccumulation());
+                }
+
                 balance.setUpdatedAt(LocalDateTime.now());
                 leaveBalanceRepository.save(balance);
             }

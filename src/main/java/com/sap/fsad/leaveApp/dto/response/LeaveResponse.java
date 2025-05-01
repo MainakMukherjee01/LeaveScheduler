@@ -30,7 +30,7 @@ public class LeaveResponse {
     private String remarks;
     private Integer numberOfDays;
     private String attachmentPath;
-    
+
     public static class LeaveStats {
         private float totalBalance;
         private float totalUsed;

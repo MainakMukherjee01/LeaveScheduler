@@ -1,6 +1,5 @@
 package com.sap.fsad.leaveApp.dto.request;
 
-
 import com.sap.fsad.leaveApp.model.enums.LeaveStatus;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
