@@ -20,3 +20,13 @@ Until Tests are fixed:
 
     Clean Install:  mvn clean install -DskipTests  
               Run:  mvn spring-boot:run -DskipTests
+
+
+
+In project Root-Repo create a .env file with fields:
+    
+    APP_JWT_SECRET=<YOUR_JWT_SECRET>
+    SPRING_DATASOURCE_USERNAME=<YOUR_H2_DB_USERNAME>
+    SPRING_DATASOURCE_PASSWORD=<YOUR_H2_DB_PASSWORD>
+    SPRING_MAIL_USERNAME=<YOUR_SMTP_ENABLED_MAIL_USERNAME>
+    SPRING_MAIL_PASSWORD=<YOUR_SMTP_ENABLED_MAIL_PASSWORD>
