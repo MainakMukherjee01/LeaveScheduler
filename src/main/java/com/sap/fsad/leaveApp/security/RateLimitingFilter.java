@@ -12,7 +12,7 @@ import java.util.concurrent.TimeUnit;
 
 @Component
 public class RateLimitingFilter implements Filter {
-    private static final int MAX_REQUESTS_PER_MINUTE = 10;
+    private static final int MAX_REQUESTS_PER_MINUTE = 120;
     private static final ConcurrentHashMap<String, RequestCounter> requestCounts = new ConcurrentHashMap<>();
 
     @Override
