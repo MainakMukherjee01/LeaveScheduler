@@ -174,7 +174,7 @@
 					"response": []
 				},
 				{
-					"name": "ForgotPassword-NOAUTH",
+					"name": "ResetPassword-NOAUTH",
 					"request": {
 						"method": "POST",
 						"header": [],
@@ -825,6 +825,54 @@
 						"url": "http://localhost:8080/api/reports/leave-usage/export/pdf"
 					},
 					"response": []
+				}
+			]
+		},
+		{
+			"name": "OtherEndpoints-NOAUTH",
+			"item": [
+				{
+					"name": "Swagger-UI",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "http://localhost:8080/swagger-ui/index.html"
+					},
+					"response": []
+				},
+				{
+					"name": "H2-DB_Console",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "http://localhost:8080/h2-console"
+					},
+					"response": []
+				}
+			],
+			"auth": {
+				"type": "noauth"
+			},
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"exec": [
+							""
+						]
+					}
 				}
 			]
 		}
