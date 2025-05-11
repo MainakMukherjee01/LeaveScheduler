@@ -42,3 +42,4 @@ build/
 
 ### Secrets ###
 .env
+node_modules
