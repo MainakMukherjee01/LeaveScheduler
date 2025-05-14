@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import LoginPage from './LoginPage';
 import RegisterPage from './RegisterPage';
 import AdminPanel from './admin/AdminPanel';
+import ManagerPanel from './manager/ManagerPanel';
 
 function App() {
   const [user, setUser] = useState(null);
@@ -19,6 +20,7 @@ function App() {
 
   if (user) {
     const isAdmin = user.roles.includes('ADMIN');
+    const isManager = user.roles.includes('MANAGER');
 
     return (
       <div style={{ padding: '20px' }}>
@@ -27,10 +29,10 @@ function App() {
           <button onClick={handleLogout} style={styles.logoutButton}>Logout</button>
         </header>
         <hr />
-        {isAdmin ? (
-          <AdminPanel />
-        ) : (
-          <p>This role does not have access to the admin dashboard.</p>
+        {isAdmin && <AdminPanel />}
+        {isManager && <ManagerPanel />}
+        {!isAdmin && !isManager && (
+          <p>You are logged in as EMPLOYEE. No dashboard available yet.</p>
         )}
       </div>
     );

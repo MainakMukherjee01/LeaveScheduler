@@ -245,6 +245,8 @@ public class EmailService {
     public void sendEmail(String to, String subject, String htmlContent) throws MessagingException {
         MimeMessage message = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+        // Set the default 'from' address
+        helper.setFrom("samareshupload02@gmail.com");
         helper.setTo(to);
         helper.setSubject(subject);
         helper.setText(htmlContent, true);

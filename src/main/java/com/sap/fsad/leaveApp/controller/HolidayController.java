@@ -65,7 +65,7 @@ public class HolidayController {
         return ResponseEntity.ok(holidays);
     }
 
-    @PutMapping("//{id:\\\\d+}")
+    @PutMapping("/{id}")
     @Operation(summary = "Update a holiday (ADMIN only)")
     @PreAuthorize("hasRole('ADMIN')")
     @SecurityRequirement(name = "bearerAuth")
@@ -76,7 +76,7 @@ public class HolidayController {
         return ResponseEntity.ok(updatedHoliday);
     }
 
-    @DeleteMapping("//{id:\\\\d+}")
+    @DeleteMapping("/{id}")
     @Operation(summary = "Delete a holiday (ADMIN only)")
     @PreAuthorize("hasRole('ADMIN')")
     @SecurityRequirement(name = "bearerAuth")
