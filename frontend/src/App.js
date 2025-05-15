@@ -3,6 +3,7 @@ import LoginPage from './LoginPage';
 import RegisterPage from './RegisterPage';
 import AdminPanel from './admin/AdminPanel';
 import ManagerPanel from './manager/ManagerPanel';
+import EmployeePanel from './employee/EmployeePanel';
 
 function App() {
   const [user, setUser] = useState(null);
@@ -21,6 +22,7 @@ function App() {
   if (user) {
     const isAdmin = user.roles.includes('ADMIN');
     const isManager = user.roles.includes('MANAGER');
+    const isEmployee = user.roles.includes('EMPLOYEE');
 
     return (
       <div style={{ padding: '20px' }}>
@@ -31,9 +33,7 @@ function App() {
         <hr />
         {isAdmin && <AdminPanel />}
         {isManager && <ManagerPanel />}
-        {!isAdmin && !isManager && (
-          <p>You are logged in as EMPLOYEE. No dashboard available yet.</p>
-        )}
+        {isEmployee && !isAdmin && !isManager && <EmployeePanel />}
       </div>
     );
   }

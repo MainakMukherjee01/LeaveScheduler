@@ -9,9 +9,11 @@ const RegisterPage = () => {
     email: '',
     password: '',
     department: '',
-    roles: ['EMPLOYEE'], // or ['MANAGER'], ['ADMIN']
+    roles: ['EMPLOYEE'],
     phone: '',
-    emergencyContact: ''
+    emergencyContact: '',
+    joiningDate: '',
+    managerId: ''
   });
 
   const [message, setMessage] = useState('');
@@ -33,7 +35,8 @@ const RegisterPage = () => {
     try {
       const response = await axios.post('http://localhost:8080/api/auth/register', {
         ...formData,
-        roles: [formData.roles] // Backend expects an array
+        managerId: formData.managerId ? parseInt(formData.managerId) : null,
+        roles: [formData.roles]  // wrap in array
       });
 
       setMessage('Registration successful!');
@@ -45,7 +48,9 @@ const RegisterPage = () => {
         department: '',
         roles: ['EMPLOYEE'],
         phone: '',
-        emergencyContact: ''
+        emergencyContact: '',
+        joiningDate: '',
+        managerId: ''
       });
     } catch (err) {
       const errMsg = err.response?.data?.message || 'Registration failed';
@@ -59,18 +64,21 @@ const RegisterPage = () => {
       {message && <p style={{ color: 'green' }}>{message}</p>}
       {error && <p style={{ color: 'red' }}>{error}</p>}
       <form onSubmit={handleSubmit} style={styles.form}>
-        <input name="username" placeholder="Username" value={formData.username} onChange={handleChange} required style={styles.input} />
-        <input name="fullName" placeholder="Full Name" value={formData.fullName} onChange={handleChange} required style={styles.input} />
-        <input name="email" type="email" placeholder="Email" value={formData.email} onChange={handleChange} required style={styles.input} />
-        <input name="password" type="password" placeholder="Password" value={formData.password} onChange={handleChange} required style={styles.input} />
-        <input name="department" placeholder="Department" value={formData.department} onChange={handleChange} style={styles.input} />
-        <select name="roles" value={formData.roles} onChange={handleChange} required style={styles.input}>
+        <input name="username" placeholder="Username" value={formData.username} onChange={handleChange} required />
+        <input name="fullName" placeholder="Full Name" value={formData.fullName} onChange={handleChange} required />
+        <input name="email" type="email" placeholder="Email" value={formData.email} onChange={handleChange} required />
+        <input name="password" type="password" placeholder="Password" value={formData.password} onChange={handleChange} required />
+        <input name="department" placeholder="Department" value={formData.department} onChange={handleChange} required />
+        <select name="roles" value={formData.roles} onChange={handleChange} required>
           <option value="EMPLOYEE">EMPLOYEE</option>
           <option value="MANAGER">MANAGER</option>
           <option value="ADMIN">ADMIN</option>
         </select>
-        <input name="phone" placeholder="Phone" value={formData.phone} onChange={handleChange} style={styles.input} />
-        <input name="emergencyContact" placeholder="Emergency Contact" value={formData.emergencyContact} onChange={handleChange} style={styles.input} />
+        <input name="phone" placeholder="Phone" value={formData.phone} onChange={handleChange} required />
+        <input name="emergencyContact" placeholder="Emergency Contact" value={formData.emergencyContact} onChange={handleChange} required />
+        <input name="joiningDate" type="date" placeholder="Joining Date" value={formData.joiningDate} onChange={handleChange} required />
+        <input name="managerId" type="number" placeholder="Manager ID (optional)" value={formData.managerId} onChange={handleChange}/>
+
         <button type="submit" style={styles.button}>Register</button>
       </form>
     </div>
@@ -79,30 +87,24 @@ const RegisterPage = () => {
 
 const styles = {
   container: {
-    maxWidth: '400px',
-    margin: '50px auto',
-    padding: '30px',
-    border: '1px solid #ccc',
-    borderRadius: '8px',
-    textAlign: 'center',
-    backgroundColor: '#f9f9f9'
+    maxWidth: '500px',
+    margin: '40px auto',
+    padding: '20px',
+    backgroundColor: '#f0f0f0',
+    borderRadius: '8px'
   },
   form: {
     display: 'flex',
-    flexDirection: 'column'
-  },
-  input: {
-    padding: '10px',
-    margin: '10px 0',
-    fontSize: '16px'
+    flexDirection: 'column',
+    gap: '10px'
   },
   button: {
     padding: '10px',
     fontSize: '16px',
-    backgroundColor: '#2196f3',
+    backgroundColor: '#007bff',
     color: 'white',
     border: 'none',
-    borderRadius: '4px'
+    borderRadius: '5px'
   }
 };
 
