@@ -9,6 +9,7 @@ import com.sap.fsad.leaveApp.model.LeavePolicy;
 import com.sap.fsad.leaveApp.model.enums.LeaveType;
 import com.sap.fsad.leaveApp.service.AdminService;
 import com.sap.fsad.leaveApp.service.LeaveCreditService;
+import com.sap.fsad.leaveApp.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -29,6 +30,9 @@ public class AdminController {
 
     @Autowired
     private AdminService adminService;
+
+    @Autowired
+    private UserService userService;
 
     @Autowired
     private LeaveCreditService leaveCreditService;
@@ -101,5 +105,13 @@ public class AdminController {
             @RequestParam String reason) {
         List<ApiResponse> responses = leaveCreditService.creditSpecialLeave(userIds, leaveType, amount, reason);
         return ResponseEntity.ok(responses);
+    }
+
+    @GetMapping("/managed")
+    @Operation(summary = "Get users managed by Specific Manager")
+    @SecurityRequirement(name = "bearerAuth")
+    public ResponseEntity<List<UserResponse>> getManagedUsers(@RequestParam(required = false) Long managerId) {
+        List<UserResponse> users = userService.getUsersByManagerId(managerId);
+        return ResponseEntity.ok(users);
     }
 }
