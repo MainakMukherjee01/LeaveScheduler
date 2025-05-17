@@ -157,7 +157,7 @@ public class AdminService {
                     .orElseThrow(() -> new ResourceNotFoundException("Manager", "id", request.getManagerId()));
 
             // Validate manager role - must be MANAGER or higher
-            if (manager.getRoles().contains(UserRole.EMPLOYEE)) {
+            if (manager.getRoles().contains(UserRole.EMPLOYEE) && !manager.getRoles().contains(UserRole.MANAGER)) {
                 throw new BadRequestException("Manager must have MANAGER role or higher");
             }
 
