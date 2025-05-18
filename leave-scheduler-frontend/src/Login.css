@@ -1,0 +1,114 @@
+.login-container {
+  height: 100vh;
+  width: 100vw;
+  display: flex;
+  flex-direction: column;
+  background: url('https://cdn.prod.website-files.com/63f5de8e8260819e3bbf4432/672c820fd8ecc8776da22490_12%20Templates%20to%20Writing%20a%20Marriage%20Leave%20Mail%20to%20Manager.png') no-repeat center center;
+  background-size: cover;
+}
+
+/* Header with centered title, top-right buttons */
+.login-header {
+  position: relative;
+  padding: 1rem 2rem;
+}
+.login-header h1 {
+  margin: 0;
+  text-align: center;
+  font-size: 2.25rem;
+  font-weight: bold;
+  color: #fff;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.4);
+}
+.header-buttons {
+  position: absolute;
+  top: 1rem;
+  right: 2rem;
+}
+.header-buttons button {
+  margin-left: 0.5rem;
+  padding: 0.5rem 1rem;
+  border: 2px solid #fff;
+  background: rgba(255,255,255,0.2);
+  color: #fff;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background 0.2s ease;
+}
+.header-buttons button:hover {
+  background: rgba(255,255,255,0.8);
+  color: #333;
+}
+
+/* Center the login-card in flex-grow area */
+.login-card {
+  background: rgba(255,255,255,0.95);
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+  width: 100%;
+  max-width: 400px;
+  margin: auto;
+}
+
+.login-card h2 {
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+.login-card label {
+  font-weight: 500;
+  display: block;
+  margin-top: 1rem;
+}
+.login-card input {
+  width: 100%;
+  padding: 0.6rem;
+  margin-top: 0.3rem;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 1rem;
+}
+
+.login-card button {
+  width: 100%;
+  padding: 0.8rem;
+  margin-top: 1.5rem;
+  background-color: #00796b;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+.login-card button:hover {
+  background-color: #00695c;
+}
+
+.error-text {
+  color: #c00;
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+.top-right-register {
+  position: absolute;
+  top: 1rem;
+  right: 2rem;
+  padding: 0.5rem 1rem;
+  border: 2px solid #fff;
+  background: rgba(255, 255, 255, 0.2);
+  color: #fff;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+  z-index: 10;
+  transition: background 0.2s ease;
+}
+
+.top-right-register:hover {
+  background: rgba(255, 255, 255, 0.8);
+  color: #333;
+}
