@@ -1,0 +1,89 @@
+.holiday-page {
+  background: url('https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=1600&q=80') no-repeat center center fixed;
+  background-size: cover;
+  min-height: 100vh;
+  padding: 50px 15px;
+}
+  
+  .holiday-card {
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 15px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    max-width: 600px;
+    margin: 0 auto;
+  }
+  
+  .holiday-header {
+    background: linear-gradient(135deg, #007bff, #0056b3);
+    color: white;
+    padding: 15px 25px;
+    border-top-left-radius: 15px;
+    border-top-right-radius: 15px;
+    font-size: 1.25rem;
+    font-weight: bold;
+  }
+  
+  .holiday-form {
+    padding: 25px;
+  }
+  
+  .btn-primary-modern {
+    background: linear-gradient(135deg, #28a745, #218838);
+    border: none;
+    padding: 10px 20px;
+    font-weight: bold;
+    color: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transform: scale(1);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  
+  .btn-primary-modern:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.2);
+  }
+  .holiday-form-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 30px;
+  }
+
+  .holiday-form-card {
+    width: 100%;
+    max-width: 600px;
+    padding: 30px;
+    border-radius: 20px;
+    backdrop-filter: blur(10px);
+    background: rgba(255, 255, 255, 0.7);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  }
+
+  .form-title {
+    font-weight: bold;
+    margin-bottom: 20px;
+    text-align: center;
+  }
+/* Holiday (yellow) */
+.highlight-holiday {
+  background-color: #ffeb3b !important;
+  border-radius: 50%;
+  color: black !important;
+}
+
+/* Leave (blue) */
+.highlight-leave {
+  background-color: #90caf9 !important;
+  border-radius: 50%;
+  color: black !important;
+}
+
+/* Both (diagonal split) */
+.highlight-both {
+  background: linear-gradient(135deg, #ffeb3b 50%, #90caf9 50%) !important;
+  border-radius: 50%;
+  color: black !important;
+}
+
+  
+  
