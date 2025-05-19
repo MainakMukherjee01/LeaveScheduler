@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import HolidayForm from './HolidayForm';
-import './HolidayForm.css'; // or SharedStyles if applicable
+import './HolidayForm.css';
 
 const HolidayManager = () => {
   const [holidays, setHolidays] = useState([]);
@@ -29,7 +29,6 @@ const HolidayManager = () => {
     setSelectedHoliday(null);
     setSuccessMessage('✅ Holiday added successfully!');
 
-    // Hide the message after 3 seconds
     setTimeout(() => {
       setSuccessMessage('');
     }, 3000);

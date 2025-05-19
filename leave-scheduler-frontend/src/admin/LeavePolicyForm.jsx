@@ -42,15 +42,28 @@ const LeavePolicyManagement = () => {
       <div style={styles.overlay}>
         <h1 style={styles.heading}>Leave Policy Management</h1>
 
-        <button
-          onClick={() => {
-            setShowForm(true);
-            setEditingPolicy(null);
-          }}
-          style={styles.createBtn}
-        >
-          + Create New
-        </button>
+        <div style={{ display: 'flex', justifyContent: 'center' }}>
+          <button
+            onClick={() => {
+              setShowForm(true);
+              setEditingPolicy(null);
+            }}
+            style={styles.createBtn}
+          >
+            + Create New
+          </button>
+        </div>
+
+        {showForm && (
+          <LeavePolicyForm
+            policy={editingPolicy}
+            onSaved={handleSaved}
+            onCancel={() => {
+              setShowForm(false);
+              setEditingPolicy(null);
+            }}
+          />
+        )}
 
         {policies.length > 0 && (
           <table style={styles.table}>
@@ -70,7 +83,7 @@ const LeavePolicyManagement = () => {
                   <td style={styles.td}>{policy.id}</td>
                   <td style={styles.td}>{policy.leaveType}</td>
                   <td style={styles.td}>{policy.annualCredit}</td>
-                  <td style={styles.td}>{policy.applicableRoles}</td>
+                  <td style={styles.td}>{policy.applicableRoles.join(', ')}</td>
                   <td style={styles.td}>{policy.isActive ? 'Yes' : 'No'}</td>
                   <td style={styles.td}>
                     <button style={styles.editBtn} onClick={() => handleEdit(policy)}>Edit</button>
@@ -80,17 +93,6 @@ const LeavePolicyManagement = () => {
               ))}
             </tbody>
           </table>
-        )}
-
-        {showForm && (
-          <LeavePolicyForm
-            policy={editingPolicy}
-            onSaved={handleSaved}
-            onCancel={() => {
-              setShowForm(false);
-              setEditingPolicy(null);
-            }}
-          />
         )}
       </div>
     </div>
@@ -114,7 +116,7 @@ const LeavePolicyForm = ({ policy, onSaved, onCancel }) => {
 
   useEffect(() => {
     if (policy) {
-      setForm(policy);
+      setForm({ ...policy, carryForward: policy.isCarryForward });
     }
   }, [policy]);
 
@@ -134,10 +136,36 @@ const LeavePolicyForm = ({ policy, onSaved, onCancel }) => {
       : 'http://localhost:8080/api/admin/leave-policies';
     const method = isEdit ? 'put' : 'post';
 
-    await axios[method](url, form, {
-      headers: { Authorization: `Bearer ${token}` }
-    });
-    onSaved();
+    try {
+      const payload = {
+        ...form,
+        isCarryForward: form.carryForward,
+        applicableRoles: [form.applicableRoles],
+        isActive: form.isActive === true || form.isActive === 'true'
+      };
+
+      const response = await axios({
+        method,
+        url,
+        data: payload,
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if ([200, 201, 204].includes(response.status)) {
+        onSaved();
+      } else {
+        alert('Received unexpected response from server.');
+      }
+    } catch (error) {
+      if (error.response) {
+        alert(error.response.data?.message || 'An error occurred while saving the policy. Please try again.');
+      } else {
+        alert('An unexpected error occurred. Please try again.');
+      }
+    }
   };
 
   return (
@@ -211,7 +239,10 @@ const styles = {
   table: {
     width: '100%',
     borderCollapse: 'collapse',
-    marginBottom: '30px'
+    marginTop: '30px',
+    backgroundColor: 'white',
+    borderRadius: '8px',
+    overflow: 'hidden'
   },
   th: {
     backgroundColor: '#343a40',
@@ -247,7 +278,8 @@ const styles = {
     boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
     display: 'flex',
     flexDirection: 'column',
-    gap: '12px'
+    gap: '12px',
+    marginTop: '30px'
   },
   formTitle: {
     textAlign: 'center',

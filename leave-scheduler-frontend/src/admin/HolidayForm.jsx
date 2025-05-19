@@ -1,92 +1,185 @@
+// // src/admin/HolidayForm.jsx
+// import React, { useState, useEffect } from 'react';
+// import axios from 'axios';
+
+// const HolidayForm = ({ holiday, onSaved, onCancel }) => {
+//   const token = localStorage.getItem('token');
+//   const [form, setForm] = useState({
+//     name: '',
+//     date: '',
+//     description: ''
+//   });
+
+//   useEffect(() => {
+//     if (holiday) setForm({ ...holiday });
+//     else setForm({ name: '', date: '', description: '' });
+//   }, [holiday]);
+
+//   const handleChange = (e) => {
+//     const { name, value } = e.target;
+//     setForm((prev) => ({ ...prev, [name]: value }));
+//   };
+
+//   const handleSubmit = async (e) => {
+//     e.preventDefault();
+
+//     try {
+//       if (holiday?.id) {
+//         await axios.put(`http://localhost:8080/api/holidays/${holiday.id}`, form, {
+//           headers: { Authorization: `Bearer ${token}` }
+//         });
+//       } else {
+//         await axios.post(`http://localhost:8080/api/holidays`, form, {
+//           headers: { Authorization: `Bearer ${token}` }
+//         });
+//       }
+//       onSaved();
+//     } catch (err) {
+//       alert('Failed to save holiday');
+//     }
+//   };
+
+//   return (
+//     <div style={{ marginTop: '20px' }}>
+//       <h4>{holiday ? 'Edit Holiday' : 'Add New Holiday'}</h4>
+//       <form onSubmit={handleSubmit} style={{ display: 'grid', gap: '10px', maxWidth: '400px' }}>
+//         <input
+//           name="name"
+//           placeholder="Holiday Name"
+//           value={form.name}
+//           onChange={handleChange}
+//           required
+//         />
+//         <input
+//           name="date"
+//           type="date"
+//           value={form.date}
+//           onChange={handleChange}
+//           required
+//         />
+//         <input
+//           name="description"
+//           placeholder="Description"
+//           value={form.description}
+//           onChange={handleChange}
+//         />
+//         <div>
+//           <button type="submit">{holiday ? 'Update' : 'Create'}</button>
+//           {holiday && <button onClick={onCancel} type="button" style={{ marginLeft: '10px' }}>Cancel</button>}
+//         </div>
+//       </form>
+//     </div>
+//   );
+// };
+
+// export default HolidayForm;
+
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import './HolidayForm.css'; // this should already include your card styles
 
 const HolidayForm = ({ holiday, onSaved, onCancel }) => {
-  const [name, setName] = useState('');
-  const [date, setDate] = useState('');
-  const [description, setDescription] = useState('');
   const token = localStorage.getItem('token');
+  const [form, setForm] = useState({
+    name: '',
+    date: '',
+    description: ''
+  });
+
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    if (holiday) {
-      setName(holiday.name);
-      setDate(holiday.date);
-      setDescription(holiday.description || '');
-    } else {
-      setName('');
-      setDate('');
-      setDescription('');
-    }
+    if (holiday) setForm({ ...holiday });
+    else setForm({ name: '', date: '', description: '' });
   }, [holiday]);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setForm((prev) => ({ ...prev, [name]: value }));
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const data = { name, date, description };
-
+    setLoading(true);
     try {
-      if (holiday) {
-        await axios.put(`http://localhost:8080/api/holidays/${holiday.id}`, data, {
+      if (holiday?.id) {
+        await axios.put(`http://localhost:8080/api/holidays/${holiday.id}`, form, {
           headers: { Authorization: `Bearer ${token}` }
         });
       } else {
-        await axios.post('http://localhost:8080/api/holidays', data, {
+        await axios.post(`http://localhost:8080/api/holidays`, form, {
           headers: { Authorization: `Bearer ${token}` }
         });
       }
       onSaved();
     } catch (err) {
       alert('Failed to save holiday');
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="holiday-form-container">
-      <div className="holiday-form-card">
-        <h4 className="form-title">{holiday ? 'Edit Holiday' : 'Add Holiday'}</h4>
-        <form onSubmit={handleSubmit}>
-          <div className="mb-3">
-            <label className="form-label">Holiday Name</label>
-            <input
-              type="text"
-              className="form-control"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              required
-              placeholder="Enter holiday name"
-            />
-          </div>
-          <div className="mb-3">
-            <label className="form-label">Date</label>
-            <input
-              type="date"
-              className="form-control"
-              value={date}
-              onChange={(e) => setDate(e.target.value)}
-              required
-            />
-          </div>
-          <div className="mb-3">
-            <label className="form-label">Description</label>
-            <textarea
-              className="form-control"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              placeholder="Optional description"
-              rows={3}
-            />
-          </div>
-          <div className="d-flex justify-content-between">
-            <button type="submit" className="btn btn-success">
-              {holiday ? 'Update Holiday' : 'Add Holiday'}
-            </button>
-            {holiday && (
-              <button type="button" className="btn btn-secondary" onClick={onCancel}>
-                Cancel
+    <div className="container mt-4">
+      <div className="card shadow-sm">
+        <div className="card-header bg-primary text-white">
+          <h5 className="mb-0">{holiday ? 'Edit Holiday' : 'Add New Holiday'}</h5>
+        </div>
+        <div className="card-body">
+          <form onSubmit={handleSubmit} className="needs-validation" noValidate>
+            <div className="mb-3">
+              <label htmlFor="name" className="form-label">Holiday Name</label>
+              <input
+                type="text"
+                className="form-control"
+                id="name"
+                name="name"
+                value={form.name}
+                onChange={handleChange}
+                required
+              />
+            </div>
+
+            <div className="mb-3">
+              <label htmlFor="date" className="form-label">Date</label>
+              <input
+                type="date"
+                className="form-control"
+                id="date"
+                name="date"
+                value={form.date}
+                onChange={handleChange}
+                required
+              />
+            </div>
+
+            <div className="mb-3">
+              <label htmlFor="description" className="form-label">Description</label>
+              <textarea
+                className="form-control"
+                id="description"
+                name="description"
+                value={form.description}
+                onChange={handleChange}
+                rows="3"
+              />
+            </div>
+
+            <div className="d-flex justify-content-end">
+              {holiday && (
+                <button
+                  type="button"
+                  className="btn btn-secondary me-2"
+                  onClick={onCancel}
+                >
+                  Cancel
+                </button>
+              )}
+              <button type="submit" className="btn btn-success" disabled={loading}>
+                {loading ? 'Saving...' : holiday ? 'Update Holiday' : 'Create Holiday'}
               </button>
-            )}
-          </div>
-        </form>
+            </div>
+          </form>
+        </div>
       </div>
     </div>
   );

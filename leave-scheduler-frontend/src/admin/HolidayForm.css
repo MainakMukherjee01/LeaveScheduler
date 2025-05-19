@@ -64,6 +64,26 @@
     margin-bottom: 20px;
     text-align: center;
   }
+/* Holiday (yellow) */
+.highlight-holiday {
+  background-color: #ffeb3b !important;
+  border-radius: 50%;
+  color: black !important;
+}
+
+/* Leave (blue) */
+.highlight-leave {
+  background-color: #90caf9 !important;
+  border-radius: 50%;
+  color: black !important;
+}
+
+/* Both (diagonal split) */
+.highlight-both {
+  background: linear-gradient(135deg, #ffeb3b 50%, #90caf9 50%) !important;
+  border-radius: 50%;
+  color: black !important;
+}
 
   
   

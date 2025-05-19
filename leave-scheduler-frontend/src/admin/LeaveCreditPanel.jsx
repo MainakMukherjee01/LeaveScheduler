@@ -1,3 +1,4 @@
+// src/admin/LeaveCreditPanel.jsx
 import React, { useState } from 'react';
 import axios from 'axios';
 import SpecialLeaveCreditForm from './SpecialLeaveCreditForm';
@@ -10,23 +11,37 @@ const LeaveCreditPanel = () => {
   const creditAnnualLeaves = async () => {
     setMessage('');
     setError('');
-    try {
-      const res = await axios.post('http://localhost:8080/api/admin/credit-leaves', {}, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
 
-      console.log('API Response:', res.data); // Debugging
-      if (res.data && res.data.message) {
+    if (!token) {
+      setError('Authorization token is missing. Please log in again.');
+      return;
+    }
+
+    console.log('Calling API to credit leaves...');
+    console.log('Token:', token);
+
+    try {
+      const res = await axios.post(
+        'http://localhost:8080/api/admin/credit-leaves',
+        {},
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      console.log('API Response:', res.data);
+
+      if (res.data?.message) {
         setMessage(res.data.message);
       } else {
-        setMessage('Annual leave credited successfully!');
+        setMessage('Annual leave credited successfully (default message).');
       }
     } catch (err) {
-      console.error('Error crediting leaves:', err); // Debugging
-      if (err.response && err.response.data && err.response.data.message) {
+      console.error('Credit leave error:', err);
+      console.log('Error response:', err.response);
+
+      if (err.response?.data?.message) {
         setError(err.response.data.message);
       } else {
-        setError('Failed to credit annual leaves. Please check your network or permissions.');
+        setError('Failed to credit annual leaves. Check your network or login status.');
       }
     }
   };
@@ -71,11 +86,17 @@ const styles = {
   },
   success: {
     color: 'green',
-    fontWeight: 'bold'
+    fontWeight: 'bold',
+    border: '1px solid green',
+    padding: '10px',
+    backgroundColor: '#e6ffed'
   },
   error: {
     color: 'red',
-    fontWeight: 'bold'
+    fontWeight: 'bold',
+    border: '1px solid red',
+    padding: '10px',
+    backgroundColor: '#ffe6e6'
   },
   blueButton: {
     padding: '10px 20px',
